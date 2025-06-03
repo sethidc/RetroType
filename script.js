@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Sound effects (using AudioContext for better compatibility)
   let audioContext;
-  const t9CycleTimeout = 800; // MODIFIED: Timeout for T9 cycling (ms)
+  const t9CycleTimeout = 800; // Timeout for T9 cycling (ms)
   const autoConfirmTimeout = 1000; // Timeout for auto-confirming preview letter (ms)
 
 
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle number keys (T9 input)
     if (t9Mapping[key]) {
-      if (lastKeyPressed === key && currentTime - lastKeyPressTime < t9CycleTimeout) { // MODIFIED: Used t9CycleTimeout
+      if (lastKeyPressed === key && currentTime - lastKeyPressTime < t9CycleTimeout) {
         keyPressCount = (keyPressCount + 1) % t9Mapping[key].length;
       } else {
         if (previewLetterElement.textContent) { // Auto-commit previous letter if new key is pressed
@@ -232,9 +232,10 @@ document.addEventListener('DOMContentLoaded', () => {
     accuracyElement.textContent = accuracy;
   }
 
-  // MODIFIED: Combined and improved event listeners
+  // Event listeners for keys
   let lastTouchEndTime = 0;
   const veryShortDelayForVisuals = 100; // ms for visual feedback reset
+  const clickGuardThreshold = 500; // MODIFIED: Increased threshold to 500ms
 
   document.querySelectorAll('.key').forEach(keyElement => {
     const keyValue = keyElement.getAttribute('data-key');
@@ -242,6 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Touchstart: Primary handler for touch devices
     keyElement.addEventListener('touchstart', (e) => {
       e.preventDefault(); // Crucial to prevent issues like zoom or ghost clicks
+      // console.log('touchstart:', keyValue); // For debugging
       handleKeyPress(keyValue);
 
       // Visual feedback
@@ -255,6 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Touchend: Mark when touch interaction finishes and reset visuals
     keyElement.addEventListener('touchend', (e) => {
       lastTouchEndTime = Date.now();
+      // console.log('touchend:', keyValue, 'lastTouchEndTime:', lastTouchEndTime); // For debugging
       setTimeout(() => {
         keyElement.style.transform = '';
         keyElement.style.boxShadow = '';
@@ -263,12 +266,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Click: Fallback for mouse, or devices where touch events might not be primary
     keyElement.addEventListener('click', (e) => {
+      const timeSinceLastTouchEnd = Date.now() - lastTouchEndTime;
+      // console.log('click:', keyValue, 'timeSinceLastTouchEnd:', timeSinceLastTouchEnd); // For debugging
+
       // If a touch interaction just ended (i.e., touchend fired recently),
       // this click is likely a "synthetic" event from the tap.
-      if (Date.now() - lastTouchEndTime < 300) { // 300ms threshold
+      if (timeSinceLastTouchEnd < clickGuardThreshold) { // MODIFIED: Used clickGuardThreshold
+        // console.log('click ignored due to recent touch'); // For debugging
         return; // Assume touchstart already handled the logic.
       }
       // Otherwise, it's a genuine click (e.g., from a mouse)
+      // console.log('click processed:', keyValue); // For debugging
       handleKeyPress(keyValue);
 
       // Visual feedback for click
