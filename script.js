@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
   let keyPressCount = 0;
   let startTime = null;
   let endTime = null;
-  // let wordTimes = []; // Kept if needed for future per-word stats, but not used for current results
 
   let totalCorrectCharsTyped = 0;
   let totalTargetCharsInWords = 0; // Sum of lengths of all gameWords selected for the current session
@@ -41,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Sound effects (using AudioContext for better compatibility)
   let audioContext;
-  const keyPressSoundTimeout = 1000; // Timeout for T9 cycling (ms)
+  const t9CycleTimeout = 800; // MODIFIED: Timeout for T9 cycling (ms)
   const autoConfirmTimeout = 1000; // Timeout for auto-confirming preview letter (ms)
 
 
@@ -93,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     currentWordIndex = 0;
     currentInput = "";
-    // wordTimes = [];
     totalCorrectCharsTyped = 0;
     totalTargetCharsInWords = 0;
     gameWords.forEach(word => totalTargetCharsInWords += word.length);
@@ -189,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle number keys (T9 input)
     if (t9Mapping[key]) {
-      if (lastKeyPressed === key && currentTime - lastKeyPressTime < keyPressSoundTimeout) {
+      if (lastKeyPressed === key && currentTime - lastKeyPressTime < t9CycleTimeout) { // MODIFIED: Used t9CycleTimeout
         keyPressCount = (keyPressCount + 1) % t9Mapping[key].length;
       } else {
         if (previewLetterElement.textContent) { // Auto-commit previous letter if new key is pressed
@@ -234,24 +232,55 @@ document.addEventListener('DOMContentLoaded', () => {
     accuracyElement.textContent = accuracy;
   }
 
-  // Add event listeners to keys
+  // MODIFIED: Combined and improved event listeners
+  let lastTouchEndTime = 0;
+  const veryShortDelayForVisuals = 100; // ms for visual feedback reset
+
   document.querySelectorAll('.key').forEach(keyElement => {
-    keyElement.addEventListener('click', () => {
-      const keyValue = keyElement.getAttribute('data-key');
+    const keyValue = keyElement.getAttribute('data-key');
+
+    // Touchstart: Primary handler for touch devices
+    keyElement.addEventListener('touchstart', (e) => {
+      e.preventDefault(); // Crucial to prevent issues like zoom or ghost clicks
       handleKeyPress(keyValue);
 
-      // Visual feedback for key press
-      keyElement.style.transform = 'translateY(3px)'; // Adjusted for subtle effect
-      keyElement.style.boxShadow = '0 2px 0 #555'; // Adjusted
+      // Visual feedback
+      keyElement.style.transform = 'translateY(3px)';
+      keyElement.style.boxShadow = '0 2px 0 #555';
       if (keyElement.classList.contains('function-key')) {
-        keyElement.style.boxShadow = '0 2px 0 #a24000'; // Darker shadow for function keys
+        keyElement.style.boxShadow = '0 2px 0 #a24000';
       }
+    }, { passive: false }); // passive: false is important for preventDefault to work
 
-
+    // Touchend: Mark when touch interaction finishes and reset visuals
+    keyElement.addEventListener('touchend', (e) => {
+      lastTouchEndTime = Date.now();
       setTimeout(() => {
         keyElement.style.transform = '';
-        keyElement.style.boxShadow = ''; // Resets to CSS defined shadow
-      }, 100);
+        keyElement.style.boxShadow = '';
+      }, veryShortDelayForVisuals);
+    });
+
+    // Click: Fallback for mouse, or devices where touch events might not be primary
+    keyElement.addEventListener('click', (e) => {
+      // If a touch interaction just ended (i.e., touchend fired recently),
+      // this click is likely a "synthetic" event from the tap.
+      if (Date.now() - lastTouchEndTime < 300) { // 300ms threshold
+        return; // Assume touchstart already handled the logic.
+      }
+      // Otherwise, it's a genuine click (e.g., from a mouse)
+      handleKeyPress(keyValue);
+
+      // Visual feedback for click
+      keyElement.style.transform = 'translateY(3px)';
+      keyElement.style.boxShadow = '0 2px 0 #555';
+      if (keyElement.classList.contains('function-key')) {
+        keyElement.style.boxShadow = '0 2px 0 #a24000';
+      }
+      setTimeout(() => {
+        keyElement.style.transform = '';
+        keyElement.style.boxShadow = '';
+      }, veryShortDelayForVisuals);
     });
   });
 
@@ -265,27 +294,5 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('dblclick', (e) => {
     e.preventDefault();
   }, { passive: false });
-
-  // Also handle touchstart for key interaction to make it more responsive on mobile
-    document.querySelectorAll('.key').forEach(keyElement => {
-        keyElement.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Prevent double event (click) and potential zoom
-            const keyValue = keyElement.getAttribute('data-key');
-            handleKeyPress(keyValue);
-
-            keyElement.style.transform = 'translateY(3px)';
-            keyElement.style.boxShadow = '0 2px 0 #555';
-             if (keyElement.classList.contains('function-key')) {
-                keyElement.style.boxShadow = '0 2px 0 #a24000';
-            }
-        }, { passive: false });
-
-        keyElement.addEventListener('touchend', () => {
-            setTimeout(() => {
-                keyElement.style.transform = '';
-                keyElement.style.boxShadow = '';
-            }, 100);
-        });
-    });
 
 });
