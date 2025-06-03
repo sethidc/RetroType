@@ -1,312 +1,376 @@
+/* This line imports a custom font called 'Press Start 2P' from Google Fonts.
+   This font gives the game its retro, pixelated look.
+   '@import' is a CSS rule to include styles from another stylesheet.
+   'display=swap' helps the text show up quickly with a fallback font while this custom font loads. */
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* The asterisk '*' is a universal selector. It applies these styles to EVERY element on the page. */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
+  margin: 0; /* Removes default spacing around elements (like paragraphs, headings). */
+  padding: 0; /* Removes default internal spacing (padding) within elements. */
+  box-sizing: border-box; /* Changes how width and height of elements are calculated.
+                             Padding and border will be included INSIDE the element's width/height,
+                             not added on top, which makes layout easier. */
+  -webkit-tap-highlight-color: transparent; /* For touch devices (especially iOS), this removes the
+                                               default grey highlight that appears when an element is tapped. */
+  user-select: none; /* Prevents users from selecting text on the page (useful for game interfaces).
+                        '-webkit-user-select' and '-ms-user-select' might be needed for older browser compatibility. */
 }
 
+/* Styles for the main <body> element, which contains all visible content. */
 body {
-  font-family: 'Press Start 2P', cursive;
-  background-color: #1a1a1a;
-  color: #333;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  overflow: hidden;
-  touch-action: manipulation;
+  font-family: 'Press Start 2P', cursive; /* Sets the default font for all text to our retro font.
+                                             'cursive' is a fallback if the custom font doesn't load. */
+  background-color: #1a1a1a; /* Sets a dark grey background color for the entire page. */
+  color: #333; /* Sets a default dark text color (though many elements will override this). */
+
+  /* These 'display: flex' properties are used for centering the phone container on the page. */
+  display: flex; /* Enables Flexbox layout, a modern way to arrange items. */
+  flex-direction: column; /* Arranges flex items vertically (though for centering a single item, this isn't strictly necessary). */
+  align-items: center; /* Centers the content (the phone container) horizontally. */
+  justify-content: center; /* Centers the content (the phone container) vertically. */
+
+  min-height: 100vh; /* Ensures the body takes up at least the full height of the browser window (viewport height). */
+  overflow: hidden; /* Hides any content that might accidentally extend beyond the body's boundaries, preventing scrollbars. */
+  touch-action: manipulation; /* Optimizes touch interactions, for example, by disabling double-tap to zoom
+                                 which can interfere with custom tap controls in games. */
 }
 
+/* Styles for the main container that looks like a retro phone. */
 .phone-container {
-  position: relative;
-  width: 100%;
-  max-width: 360px;
-  height: 85vh;
-  max-height: 700px;
-  background: linear-gradient(145deg, #2c3e50, #34495e);
-  border-radius: 30px;
-  padding: 15px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5),
-    inset 0 -5px 10px rgba(0, 0, 0, 0.3),
-    inset 0 5px 10px rgba(255, 255, 255, 0.2);
+  position: relative; /* Allows us to position child elements absolutely relative to this container if needed. */
+  width: 100%; /* Tries to take the full width of its parent (the body), but... */
+  max-width: 360px; /* ...it won't get wider than 360 pixels. This helps keep the phone look consistent. */
+  height: 85vh; /* Sets the height to 85% of the viewport height. */
+  max-height: 700px; /* But it won't get taller than 700 pixels. */
+  background: linear-gradient(145deg, #2c3e50, #34495e); /* A subtle diagonal color gradient for the phone body. */
+  border-radius: 30px; /* Rounds the corners to give it a phone-like shape. */
+  padding: 15px; /* Adds some internal spacing around the phone's content (the screen). */
+
+  /* 'box-shadow' adds shadows to create a 3D effect.
+     - The first shadow is an outer shadow below the phone.
+     - The 'inset' shadows are internal, creating highlights and depth on the phone body itself. */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), /* Outer shadow: offset-x, offset-y, blur-radius, color (black with 50% opacity). */
+    inset 0 -5px 10px rgba(0, 0, 0, 0.3),   /* Inner bottom shadow. */
+    inset 0 5px 10px rgba(255, 255, 255, 0.2); /* Inner top highlight (white with 20% opacity). */
+
+  /* These flex properties are for arranging items (like the brand name and screen) inside the phone container. */
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: column; /* Stack items vertically (brand above screen). */
+  align-items: center; /* Center items horizontally within the phone container. */
 }
 
+/* Styles for the "RETRO" brand name text on the phone. */
 .phone-brand {
-  color: #f8f8f8;
-  font-size: 1rem;
-  margin-top: 5px;
-  letter-spacing: 1px;
-  text-shadow: 0 0 5px rgba(0, 255, 255, 0.7);
+  color: #f8f8f8; /* A light grey/off-white color for the text. */
+  font-size: 1rem; /* Sets the font size. 'rem' is relative to the root font size (usually 16px). */
+  margin-top: 5px; /* Adds a small space above the brand name. */
+  letter-spacing: 1px; /* Increases the space between letters. */
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.7); /* Adds a cyan-colored glow effect to the text. */
 }
 
+/* Styles for the phone's screen area. */
 .screen {
-  width: 100%;
-  height: calc(100% - 20px);
-  background-color: #5adc78;
-  border-radius: 5px;
-  border: 10px solid #1a1a1a;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
-  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
+  width: 100%; /* The screen takes the full available width inside the .phone-container's padding. */
+  height: calc(100% - 20px); /* The screen takes the full available height minus 20px (likely for the brand name).
+                                'calc()' lets us do math with CSS units. */
+  background-color: #5adc78; /* A classic green color for the screen background. */
+  border-radius: 5px; /* Slightly rounded corners for the screen. */
+  border: 10px solid #1a1a1a; /* A thick, dark border around the screen, like an old phone bezel. */
+  display: flex; /* Use Flexbox to arrange items within the screen (status bar, game area). */
+  flex-direction: column; /* Stack items vertically. */
+  overflow: hidden; /* If content inside the screen is too big, it gets cut off (no scrollbars). */
+  position: relative; /* Needed for positioning elements like the scanlines effect absolutely within the screen. */
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3); /* An inner shadow to give the screen a slightly recessed look. */
 }
 
+/* Styles for the status bar at the top of the phone screen (shows signal, battery, etc.). */
 .status-bar {
-  height: 24px;
-  background-color: #3a8c48;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 10px;
-  font-size: 10px;
-  border-bottom: 2px solid #1a1a1a;
-  color: #000; /* Added for better visibility of "RetroType" text */
+  height: 24px; /* Fixed height for the status bar. */
+  background-color: #3a8c48; /* A darker green than the main screen. */
+  display: flex; /* Use Flexbox to arrange items (signal, title, battery) in a row. */
+  justify-content: space-between; /* Puts space between the items: signal on left, battery on right, title in middle. */
+  align-items: center; /* Vertically aligns items in the center of the status bar. */
+  padding: 0 10px; /* Adds horizontal padding inside the status bar. */
+  font-size: 10px; /* Small font size for status bar text. */
+  border-bottom: 2px solid #1a1a1a; /* A dark line separating the status bar from the game area. */
+  color: #000; /* Black color for text like "RetroType" in the status bar for better visibility. */
 }
 
+/* Styles for the battery icon container (helps with alignment). */
 .battery-icon {
-  display: flex;
-  align-items: center;
+  display: flex; /* Enables Flexbox for the SVG inside. */
+  align-items: center; /* Vertically aligns the SVG. */
 }
 
+/* Styles for the signal bars container. */
 .signal-bars {
-  display: flex;
-  align-items: flex-end;
-  height: 10px;
+  display: flex; /* Arranges the individual bars in a row. */
+  align-items: flex-end; /* Aligns bars to their bottom edge, making them grow upwards. */
+  height: 10px; /* Sets the maximum height for the signal bars area. */
 }
 
+/* Styles for each individual signal bar. */
 .bar {
-  width: 3px;
-  background-color: #000;
-  margin-right: 1px;
+  width: 3px; /* Width of each bar. */
+  background-color: #000; /* Black color for the bars. */
+  margin-right: 1px; /* Small space between bars. */
 }
 
+/* These rules set the height of each signal bar, creating the iconic ascending look.
+   ':nth-child(n)' selects the nth bar. */
 .bar:nth-child(1) { height: 3px; }
 .bar:nth-child(2) { height: 5px; }
 .bar:nth-child(3) { height: 7px; }
 .bar:nth-child(4) { height: 9px; }
 
+/* Styles for the main game area below the status bar. */
 .game-area {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
+  flex: 1; /* This makes the game area take up all available vertical space within the screen
+             (after the status bar takes its height). This is a Flexbox property. */
+  display: flex; /* Use Flexbox to arrange items inside the game area. */
+  flex-direction: column; /* Stack game elements (header, word display, input, keypad) vertically. */
+  padding: 10px; /* Adds some internal spacing around the game elements. */
 }
 
+/* Styles for the "RetroType Challenge" header text. */
 .header {
-  text-align: center;
-  font-size: 1rem;
-  margin-bottom: 15px;
-  color: #000;
-  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+  text-align: center; /* Centers the text. */
+  font-size: 1rem; /* Font size for the header. */
+  margin-bottom: 15px; /* Adds space below the header. */
+  color: #000; /* Black text color. */
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5); /* A subtle light shadow to make text pop slightly. */
 }
 
+/* Styles for the container holding the "WORD X OF Y" label and the target word. */
 .target-word-container {
-  margin-top: 15px;
-  text-align: center;
+  margin-top: 15px; /* Space above this container. */
+  text-align: center; /* Centers its content. */
 }
 
+/* Styles for the "WORD X OF Y" label. */
 .word-label {
-  font-size: 0.7rem;
-  margin-bottom: 8px;
-  color: #000;
+  font-size: 0.7rem; /* Smaller font size for this label. */
+  margin-bottom: 8px; /* Space below the label, before the target word. */
+  color: #000; /* Black text color. */
 }
 
+/* Styles for the actual word the player needs to type. */
 .target-word {
-  font-size: 1.5rem;
-  background-color: #3a8c48;
-  padding: 8px 15px;
-  border: 3px solid #000;
-  border-radius: 5px;
-  letter-spacing: 2px;
-  display: inline-block;
-  color: #fff;
-  text-shadow: 2px 2px 0 #000;
+  font-size: 1.5rem; /* Larger font size for the target word. */
+  background-color: #3a8c48; /* Darker green background, like a display segment. */
+  padding: 8px 15px; /* Internal spacing around the word text. */
+  border: 3px solid #000; /* Thick black border. */
+  border-radius: 5px; /* Slightly rounded corners. */
+  letter-spacing: 2px; /* Increased space between letters of the word. */
+  display: inline-block; /* Allows setting padding/margin and centering, but flows with text if needed. */
+  color: #fff; /* White text color for contrast against the green background. */
+  text-shadow: 2px 2px 0 #000; /* A strong black shadow to give a 3D/embossed look. */
+  /* A more complex shadow: a darker green shadow below for depth, and a subtle inner white highlight. */
   box-shadow: 0 4px 0 #1a5928, inset 0 0 10px rgba(255, 255, 255, 0.2);
-  min-height: 40px; /* Ensure consistent height */
+  min-height: 40px; /* Ensures the box has a minimum height, preventing layout shifts if words are short. */
 }
 
+/* Styles for the area where the player's typed input is shown. */
 .input-area {
-  margin: 20px 0;
-  height: 60px;
-  background-color: #3a8c48;
-  border: 3px solid #000;
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
-  padding: 0 10px; /* Added padding */
+  margin: 20px 0; /* Vertical spacing around this area. */
+  height: 60px; /* Fixed height for the input display. */
+  background-color: #3a8c48; /* Dark green background. */
+  border: 3px solid #000; /* Black border. */
+  border-radius: 5px; /* Rounded corners. */
+  display: flex; /* Use Flexbox to align the text and cursor inside. */
+  align-items: center; /* Vertically center content. */
+  justify-content: center; /* Horizontally center content (primarily the cursor when text is empty). */
+  position: relative; /* Needed for positioning the preview letter absolutely. */
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3); /* Inner shadow for a recessed look. */
+  padding: 0 10px; /* Horizontal padding to prevent text from touching the edges. */
 }
 
+/* Styles for the text that the player types. */
 .input-text {
-  font-size: 1.3rem;
-  letter-spacing: 1px;
-  color: #fff;
-  text-shadow: 1px 1px 0 #000;
-  min-height: 25px; /* Ensure consistent height */
-  flex-grow: 1; /* Allow it to take available space */
-  text-align: center; /* Center the text */
+  font-size: 1.3rem; /* Font size for the typed text. */
+  letter-spacing: 1px; /* Space between letters. */
+  color: #fff; /* White text color. */
+  text-shadow: 1px 1px 0 #000; /* Black text shadow for depth. */
+  min-height: 25px; /* Minimum height to maintain layout consistency. */
+  flex-grow: 1; /* Allows the text area to expand and take available horizontal space. */
+  text-align: center; /* Centers the typed text within this element. */
 }
 
+/* Styles for the blinking cursor in the input area. */
 .cursor {
-  display: inline-block;
-  width: 10px;
-  height: 20px;
-  background-color: #fff;
-  margin-left: 2px;
-  animation: blink 1s infinite;
+  display: inline-block; /* Makes it behave like a character in the text flow. */
+  width: 10px; /* Width of the cursor. */
+  height: 20px; /* Height of the cursor. */
+  background-color: #fff; /* White color. */
+  margin-left: 2px; /* Small space to the left of the cursor. */
+  animation: blink 1s infinite; /* Applies the 'blink' animation, making it run for 1 second and repeat forever. */
 }
 
+/* Defines the 'blink' animation for the cursor. */
 @keyframes blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
+  0%, 49% { opacity: 1; } /* From 0% to 49% of the animation, cursor is visible (opacity 1). */
+  50%, 100% { opacity: 0; } /* From 50% to 100%, cursor is invisible (opacity 0), creating the blink. */
 }
 
+/* Styles for the small letter preview (T9 hint) shown in the input area. */
 .preview-letter {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%); /* Vertically center */
-  font-size: 1.2rem;
-  color: #fff;
-  background-color: #1a5928;
-  padding: 2px 8px;
-  border-radius: 3px;
-  border: 2px solid #000;
-  text-shadow: 1px 1px 0 #000;
+  position: absolute; /* Allows precise positioning relative to its parent (.input-area). */
+  right: 10px; /* Positions it 10px from the right edge of the input area. */
+  top: 50%; /* Positions the top of the element at the vertical midpoint of the input area. */
+  transform: translateY(-50%); /* Shifts the element up by 50% of its own height, perfectly centering it vertically. */
+  font-size: 1.2rem; /* Font size for the preview letter. */
+  color: #fff; /* White text. */
+  background-color: #1a5928; /* Very dark green background. */
+  padding: 2px 8px; /* Small padding around the letter. */
+  border-radius: 3px; /* Slightly rounded corners. */
+  border: 2px solid #000; /* Black border. */
+  text-shadow: 1px 1px 0 #000; /* Black text shadow. */
 }
 
+/* Styles for the keypad area containing all the number keys. */
 .keypad {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-gap: 8px;
-  margin-top: auto; /* Pushes keypad to the bottom of game-area */
-  padding: 5px;
+  width: 100%; /* Keypad takes the full available width. */
+  display: grid; /* Enables CSS Grid layout, perfect for a grid of keys. */
+  grid-template-columns: repeat(3, 1fr); /* Creates 3 columns, each taking up an equal fraction (1fr) of the available width. */
+  grid-gap: 8px; /* Sets an 8px gap between the grid cells (the keys). */
+  margin-top: auto; /* This is a Flexbox trick used on a child of a flex container (.game-area).
+                       It pushes the keypad to the bottom of the .game-area. */
+  padding: 5px; /* Small padding around the entire keypad. */
 }
 
+/* Styles for each individual key on the keypad. */
 .key {
-  aspect-ratio: 1.2/1;
-  background: linear-gradient(to bottom, #f0f0f0, #c0c0c0);
-  border: 3px solid #000;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Press Start 2P', cursive;
+  aspect-ratio: 1.2/1; /* Defines the shape of the key: width will be 1.2 times its height.
+                          This helps maintain key shape even if the keypad resizes. */
+  background: linear-gradient(to bottom, #f0f0f0, #c0c0c0); /* A gradient for a slightly 3D, plastic button look. */
+  border: 3px solid #000; /* Thick black border around the key. */
+  border-radius: 8px; /* Rounded corners for the key. */
+  display: flex; /* Use Flexbox to arrange the number and letters inside the key. */
+  flex-direction: column; /* Stack number above letters. */
+  align-items: center; /* Center content horizontally. */
+  justify-content: center; /* Center content vertically. */
+  font-family: 'Press Start 2P', cursive; /* Use the retro font for key text. */
+  /* 3D shadow effect for the key: a dark shadow below it, and a light inner highlight at the top. */
   box-shadow: 0 5px 0 #666, inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  position: relative;
-  transition: transform 0.05s, box-shadow 0.05s; /* Faster transition */
-  cursor: pointer; /* Indicate clickable */
+  position: relative; /* Needed if we want to position things absolutely inside the key later. */
+  /* Smooth transition for when the key is pressed (transform and box-shadow changes). */
+  transition: transform 0.05s, box-shadow 0.05s; /* Makes changes animate over 0.05 seconds. */
+  cursor: pointer; /* Changes the mouse cursor to a pointer (hand) when hovering over a key, indicating it's clickable. */
 }
 
+/* Styles for a key when it's being pressed (active state). */
 .key:active {
-  transform: translateY(5px);
-  box-shadow: 0 0 0 #666;
+  transform: translateY(5px); /* Moves the key down by 5px, simulating being pressed. */
+  box-shadow: 0 0 0 #666; /* Removes or flattens the bottom shadow, enhancing the pressed look. */
 }
 
+/* Styles for the main number displayed on a key (e.g., "2"). */
 .key-number {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: #000;
+  font-size: 1.3rem; /* Larger font size for the number. */
+  font-weight: bold; /* Makes the number bold (though 'Press Start 2P' might not have a separate bold variant). */
+  color: #000; /* Black color. */
 }
 
+/* Styles for the small T9 letters displayed below the number on a key (e.g., "ABC"). */
 .key-letters {
-  font-size: 0.5rem;
-  color: #333;
-  margin-top: 3px;
+  font-size: 0.5rem; /* Very small font size for these letters. */
+  color: #333; /* Dark grey color. */
+  margin-top: 3px; /* Small space above these letters. */
 }
 
+/* Special styles for function keys (like 'Clear' and 'Enter') to make them look different. */
 .function-key {
-  background: linear-gradient(to bottom, #ff9c40, #e67e22);
+  background: linear-gradient(to bottom, #ff9c40, #e67e22); /* An orange gradient for function keys. */
 }
+/* Ensure text on function keys is visible against their orange background. */
 .function-key .key-number, .function-key .key-letters {
-    color: #000; /* Ensure text is visible on orange keys */
+    color: #000; /* Black text for numbers and letters on function keys. */
 }
 
 
+/* Styles for the results screen that appears at the end of the game. */
 .results {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #5adc78;
-  display: none; /* Initially hidden */
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 10;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
+  position: absolute; /* Positioned relative to its nearest positioned ancestor (the .screen). */
+  top: 0; /* Aligns to the top of the screen. */
+  left: 0; /* Aligns to the left of the screen. */
+  width: 100%; /* Takes the full width of the screen. */
+  height: 100%; /* Takes the full height of the screen, covering the game area. */
+  background-color: #5adc78; /* Same green as the main screen background. */
+  display: none; /* Initially hidden. JavaScript will change this to 'flex' to show it. */
+  flex-direction: column; /* Stack result items vertically. */
+  align-items: center; /* Center items horizontally. */
+  justify-content: center; /* Center items vertically. */
+  padding: 20px; /* Padding around the results content. */
+  z-index: 10; /* Ensures the results screen appears on top of other screen content (like the scanlines). */
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4); /* Inner shadow for a slight depth effect. */
 }
 
+/* Styles for the "CHALLENGE COMPLETE!" title on the results screen. */
 .results-title {
-  font-size: 1.5rem;
-  margin-bottom: 25px;
-  color: #000;
-  text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.5);
-  text-align: center;
+  font-size: 1.5rem; /* Large font size for the title. */
+  margin-bottom: 25px; /* Space below the title. */
+  color: #000; /* Black text. */
+  text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.5); /* Light shadow for a pop effect. */
+  text-align: center; /* Center the title text. */
 }
 
+/* Styles for each individual result item (e.g., "Total Time: X", "Speed: Y WPM"). */
 .result-item {
-  font-size: 0.9rem;
-  margin: 8px 0;
-  width: 100%;
-  text-align: center;
-  color: #000;
-  background-color: #3a8c48;
-  padding: 8px;
-  border: 2px solid #000;
-  border-radius: 5px;
+  font-size: 0.9rem; /* Font size for result details. */
+  margin: 8px 0; /* Vertical spacing between result items. */
+  width: 100%; /* Each item takes the full width of the results area. */
+  text-align: center; /* Centers the text within the item. */
+  color: #000; /* Black text. */
+  background-color: #3a8c48; /* Dark green background for each item, like a display segment. */
+  padding: 8px; /* Padding inside each item. */
+  border: 2px solid #000; /* Black border. */
+  border-radius: 5px; /* Rounded corners. */
 }
 
+/* Styles for the "RESTART" button on the results screen. */
 .restart-btn {
-  margin-top: 30px;
-  padding: 12px 20px;
-  background: linear-gradient(to bottom, #ff9c40, #e67e22);
-  border: 3px solid #000;
-  border-radius: 8px;
-  font-family: 'Press Start 2P', cursive;
-  font-size: 1rem;
-  box-shadow: 0 5px 0 #b35900;
-  cursor: pointer;
-  color: #000;
-  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
-  transition: transform 0.05s, box-shadow 0.05s; /* Faster transition */
+  margin-top: 30px; /* Space above the restart button. */
+  padding: 12px 20px; /* Padding inside the button. */
+  background: linear-gradient(to bottom, #ff9c40, #e67e22); /* Orange gradient, similar to function keys. */
+  border: 3px solid #000; /* Black border. */
+  border-radius: 8px; /* Rounded corners. */
+  font-family: 'Press Start 2P', cursive; /* Retro font. */
+  font-size: 1rem; /* Font size for the button text. */
+  box-shadow: 0 5px 0 #b35900; /* A darker orange shadow below the button for a 3D effect. */
+  cursor: pointer; /* Pointer cursor on hover. */
+  color: #000; /* Black text. */
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3); /* Subtle light text shadow. */
+  transition: transform 0.05s, box-shadow 0.05s; /* Smooth transition for the pressed state. */
 }
 
+/* Styles for the "RESTART" button when it's being pressed. */
 .restart-btn:active {
-  transform: translateY(5px);
-  box-shadow: 0 0 0 #b35900;
+  transform: translateY(5px); /* Moves button down to simulate being pressed. */
+  box-shadow: 0 0 0 #b35900; /* Flattens the bottom shadow. */
 }
 
-/* Scanlines effect for extra retro feel */
+/* This section adds a "scanlines" effect over the screen for an extra retro feel.
+   It uses a '::after' pseudo-element, which is like adding a virtual child element to .screen using CSS. */
 .screen::after {
-  content: "";
-  position: absolute;
+  content: ""; /* Required for pseudo-elements to be generated. */
+  position: absolute; /* Positioned relative to the .screen. */
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 100%; /* Covers the entire screen. */
+  /* Creates a repeating linear gradient. It's transparent for the top half of each 4px strip,
+     and then very slightly dark for the bottom half, creating thin horizontal lines. */
   background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0) 50%,
-    rgba(0, 0, 0, 0.05) 50%,
-    rgba(0, 0, 0, 0.05) 100%
+    to bottom, /* Gradient runs from top to bottom. */
+    rgba(255, 255, 255, 0) 0%,    /* Start transparent. */
+    rgba(255, 255, 255, 0) 50%,   /* Transparent up to the halfway point of the strip. */
+    rgba(0, 0, 0, 0.05) 50%,  /* Slightly dark black (5% opacity) from halfway. */
+    rgba(0, 0, 0, 0.05) 100% /* Slightly dark black to the end of the strip. */
   );
-  background-size: 100% 4px;
-  pointer-events: none;
-  z-index: 5; /* Ensure it's above game content but below results pop-up if needed */
+  background-size: 100% 4px; /* The gradient pattern repeats every 4 pixels vertically.
+                                 The width is 100% so lines span the screen. */
+  pointer-events: none; /* Makes the scanlines overlay non-interactive, so clicks pass through to elements underneath. */
+  z-index: 5; /* Stacking order: ensures scanlines are above the general game content but
+                 can be below things like the results pop-up if the pop-up has a higher z-index. */
 }
