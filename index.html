@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>RetroType Challenge</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="phone-container">
+    <div class="phone-brand">RETRO</div>
+    <div class="screen">
+      <div class="status-bar">
+        <div class="signal-bars">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+        <div>RetroType</div>
+        <div class="battery-icon">
+          <svg width="15" height="8" viewBox="0 0 15 8" fill="none">
+            <rect x="0" y="0" width="13" height="8" stroke="#000" stroke-width="1" fill="none"/>
+            <rect x="1" y="1" width="9" height="6" fill="#000"/>
+            <rect x="13" y="2" width="2" height="4" fill="#000"/>
+          </svg>
+        </div>
+      </div>
+      <div class="game-area">
+        <div class="header">RetroType Challenge</div>
+        <div class="target-word-container">
+          <div class="word-label">WORD <span id="word-count">1</span> OF 3</div>
+          <div class="target-word" id="target-word">NOSTALGIC</div>
+        </div>
+        <div class="input-area">
+          <div class="input-text" id="input-text"></div>
+          <div class="cursor"></div>
+          <div class="preview-letter" id="preview-letter"></div>
+        </div>
+        <div class="keypad">
+          <div class="key" data-key="1">
+            <div class="key-number">1</div>
+            <div class="key-letters">.,'?!</div>
+          </div>
+          <div class="key" data-key="2">
+            <div class="key-number">2</div>
+            <div class="key-letters">ABC</div>
+          </div>
+          <div class="key" data-key="3">
+            <div class="key-number">3</div>
+            <div class="key-letters">DEF</div>
+          </div>
+          <div class="key" data-key="4">
+            <div class="key-number">4</div>
+            <div class="key-letters">GHI</div>
+          </div>
+          <div class="key" data-key="5">
+            <div class="key-number">5</div>
+            <div class="key-letters">JKL</div>
+          </div>
+          <div class="key" data-key="6">
+            <div class="key-number">6</div>
+            <div class="key-letters">MNO</div>
+          </div>
+          <div class="key" data-key="7">
+            <div class="key-number">7</div>
+            <div class="key-letters">PQRS</div>
+          </div>
+          <div class="key" data-key="8">
+            <div class="key-number">8</div>
+            <div class="key-letters">TUV</div>
+          </div>
+          <div class="key" data-key="9">
+            <div class="key-number">9</div>
+            <div class="key-letters">WXYZ</div>
+          </div>
+          <div class="key function-key" data-key="clear">
+            <div class="key-number">C</div>
+            <div class="key-letters">CLEAR</div>
+          </div>
+          <div class="key" data-key="0">
+            <div class="key-number">0</div>
+            <div class="key-letters">SPACE</div>
+          </div>
+          <div class="key function-key" data-key="enter">
+            <div class="key-number">#</div>
+            <div class="key-letters">ENTER</div>
+          </div>
+        </div>
+      </div>
+      <div class="results" id="results">
+        <div class="results-title">CHALLENGE COMPLETE!</div>
+        <div class="result-item">Total Time: <span id="total-time">0.0</span>s</div>
+        <div class="result-item">Speed: <span id="wpm">0</span> WPM</div>
+        <div class="result-item">Accuracy: <span id="accuracy">0</span>%</div>
+        <button class="restart-btn" id="restart-btn">RESTART</button>
+      </div>
+    </div>
+  </div>
+  <script src="script.js" defer></script>
+</body>
+</html>
