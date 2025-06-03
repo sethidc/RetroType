@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let endTime = null;
 
   let totalCorrectCharsTyped = 0;
-  let totalTargetCharsInWords = 0; // Sum of lengths of all gameWords selected for the current session
+  let totalTargetCharsInWords = 0;
 
   // T9 keypad mapping
   const t9Mapping = {
@@ -38,57 +38,49 @@ document.addEventListener('DOMContentLoaded', () => {
   const accuracyElement = document.getElementById('accuracy');
   const restartBtn = document.getElementById('restart-btn');
 
-  // Sound effects (using AudioContext for better compatibility)
+  // Sound effects
   let audioContext;
-  const t9CycleTimeout = 800; // Timeout for T9 cycling (ms)
-  const autoConfirmTimeout = 1000; // Timeout for auto-confirming preview letter (ms)
-
+  const t9CycleTimeout = 1000; // Timeout for T9 cycling (ms) - reverted to 1000ms
+  const autoConfirmTimeout = 1000; // Timeout for auto-confirming preview letter (ms) - reverted to 1000ms
 
   function playKeyTone(frequency, duration) {
     try {
       if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
       }
-      if (!audioContext) return; // Exit if AudioContext is not supported/initialized
+      if (!audioContext) return;
 
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
       oscillator.type = 'square';
       oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-
       gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + duration);
 
       oscillator.connect(gainNode);
       gainNode.connect(audioContext.destination);
-
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + duration);
     } catch (e) {
       console.warn("AudioContext not supported or error playing sound:", e);
-      audioContext = null; // Prevent further attempts if it fails badly
+      audioContext = null;
     }
   }
 
   let autoConfirmTimer = null;
 
-  // Initialize game
   function initGame() {
-    // Select 3 random words
     gameWords = [];
-    const tempWords = [...words]; // Create a copy to draw from
+    const tempWords = [...words];
     while (gameWords.length < 3 && tempWords.length > 0) {
       const randomIndex = Math.floor(Math.random() * tempWords.length);
-      const randomWord = tempWords.splice(randomIndex, 1)[0]; // Remove word from temp list
-      if (!gameWords.includes(randomWord)) {
-        gameWords.push(randomWord);
-      }
+      const randomWord = tempWords.splice(randomIndex, 1)[0];
+      gameWords.push(randomWord); // Simplified: splice ensures it's unique from tempWords for this pick
     }
-    if (gameWords.length < 3 && words.length >=3) { // Fallback if unique word selection fails with small pool
-        gameWords = words.slice(0,3); // Just take the first 3
+    if (gameWords.length < 3 && words.length >= 3) {
+        gameWords = words.slice(0,3);
     }
-
 
     currentWordIndex = 0;
     currentInput = "";
@@ -96,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
     totalTargetCharsInWords = 0;
     gameWords.forEach(word => totalTargetCharsInWords += word.length);
 
-    // Update UI
     targetWordElement.textContent = gameWords[0] || "N/A";
     inputTextElement.textContent = "";
     wordCountElement.textContent = gameWords.length > 0 ? "1" : "0";
@@ -104,46 +95,43 @@ document.addEventListener('DOMContentLoaded', () => {
     resultsElement.style.display = "none";
     document.querySelector('.game-area').style.display = 'flex';
 
-
-    // Start timer on first interaction
     startTime = null;
     endTime = null;
     lastKeyPressed = null;
     keyPressCount = 0;
-    clearTimeout(autoConfirmTimer); // Clear any pending auto-confirm
+    clearTimeout(autoConfirmTimer);
   }
 
-  // Handle key press
   function handleKeyPress(key) {
-    if (resultsElement.style.display === 'flex') return; // Don't process keys if results are shown
+    if (resultsElement.style.display === 'flex') return;
 
-    // Play key tone
-    const baseFrequency = 300;
-    const keyNum = parseInt(key);
+    const baseFrequency = 300; // Adjusted base from user's code (was 600 in user example, then 300)
+    const keyNum = parseInt(key); // parseInt(key) was in user's example, then keyNum
     let freqToPlay = baseFrequency;
-    if (!isNaN(keyNum)) {
-        freqToPlay = baseFrequency + (keyNum % 10) * 50; // Cycle through 0-9 for frequency
+
+    if (!isNaN(keyNum)) { // Match user example where parseInt(key) was used for keyFrequency offset
+        freqToPlay = (baseFrequency + (keyNum % 10) * 50); // Keep consistent with previous logic if key is number
     } else if (key === 'clear') {
         freqToPlay = 200;
     } else if (key === 'enter') {
         freqToPlay = 700;
     }
-    playKeyTone(freqToPlay, 0.1);
+    playKeyTone(freqToPlay, 0.15); // User's example had 0.15 duration
 
 
-    if (startTime === null && key !== 'clear' && key !== 'enter') { // Start timer on first char input
+    if (startTime === null && key !== 'clear' && key !== 'enter') {
       startTime = Date.now();
     }
 
     const currentTime = Date.now();
-    clearTimeout(autoConfirmTimer); // Clear previous auto-confirm timer
+    clearTimeout(autoConfirmTimer);
 
     if (key === 'clear') {
-      if (previewLetterElement.textContent) { // If there's a preview, clear that first
+      if (previewLetterElement.textContent) {
           previewLetterElement.textContent = "";
           lastKeyPressed = null;
           keyPressCount = 0;
-      } else if (currentInput.length > 0) { // Otherwise, clear last confirmed character
+      } else if (currentInput.length > 0) {
         currentInput = currentInput.slice(0, -1);
         inputTextElement.textContent = currentInput;
       }
@@ -151,17 +139,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (key === 'enter') {
-      if (previewLetterElement.textContent) { // Confirm any previewed letter
+      if (previewLetterElement.textContent) {
         currentInput += previewLetterElement.textContent;
         inputTextElement.textContent = currentInput;
         previewLetterElement.textContent = "";
       }
 
-      if (gameWords.length === 0) return; // No words to check against
+      if (gameWords.length === 0) return;
 
-      // Accuracy calculation for the current word
       const targetWord = gameWords[currentWordIndex];
-      if (targetWord) { // Ensure targetWord is defined
+      if (targetWord) {
           for (let i = 0; i < targetWord.length; i++) {
               if (i < currentInput.length && currentInput[i] === targetWord[i]) {
                   totalCorrectCharsTyped++;
@@ -176,6 +163,9 @@ document.addEventListener('DOMContentLoaded', () => {
         wordCountElement.textContent = currentWordIndex + 1;
         currentInput = "";
         inputTextElement.textContent = "";
+        // startTime = Date.now(); // In user's "worked" code, startTime was reset per word for wordTimes
+                                  // We use a global startTime for overall WPM, so this isn't strictly needed here
+                                  // unless we bring back per-word time tracking.
       } else {
         endTime = Date.now();
         showResults();
@@ -185,12 +175,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Handle number keys (T9 input)
     if (t9Mapping[key]) {
-      if (lastKeyPressed === key && currentTime - lastKeyPressTime < t9CycleTimeout) {
+      if (lastKeyPressed === key && currentTime - lastKeyPressTime < t9CycleTimeout) { // Using t9CycleTimeout (1000ms)
         keyPressCount = (keyPressCount + 1) % t9Mapping[key].length;
       } else {
-        if (previewLetterElement.textContent) { // Auto-commit previous letter if new key is pressed
+        if (previewLetterElement.textContent) {
           currentInput += previewLetterElement.textContent;
           inputTextElement.textContent = currentInput;
         }
@@ -201,22 +190,20 @@ document.addEventListener('DOMContentLoaded', () => {
       lastKeyPressed = key;
       lastKeyPressTime = currentTime;
 
-      // Auto-confirm after delay
       autoConfirmTimer = setTimeout(() => {
-        if (previewLetterElement.textContent && lastKeyPressed === key) { // Check if still the same key's preview
+        if (previewLetterElement.textContent && lastKeyPressed === key) {
           currentInput += previewLetterElement.textContent;
           inputTextElement.textContent = currentInput;
           previewLetterElement.textContent = "";
-          lastKeyPressed = null; // Reset as it's confirmed
+          lastKeyPressed = null;
           keyPressCount = 0;
         }
-      }, autoConfirmTimeout);
+      }, autoConfirmTimeout); // Using autoConfirmTimeout (1000ms)
     }
   }
 
-  // Show results
   function showResults() {
-    document.querySelector('.game-area').style.display = 'none'; // Hide game area
+    document.querySelector('.game-area').style.display = 'none';
     resultsElement.style.display = "flex";
 
     const overallTotalTime = (endTime && startTime) ? (endTime - startTime) / 1000 : 0;
@@ -229,76 +216,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     totalTimeElement.textContent = overallTotalTime.toFixed(1);
     wpmElement.textContent = wpm;
-    accuracyElement.textContent = accuracy;
+    accuracyElement.textContent = accuracy; // Using improved accuracy
   }
 
-  // Event listeners for keys
-  let lastTouchEndTime = 0;
-  const veryShortDelayForVisuals = 100; // ms for visual feedback reset
-  const clickGuardThreshold = 500; // MODIFIED: Increased threshold to 500ms
-
+  // Simplified Event Listeners: Only using 'click'
   document.querySelectorAll('.key').forEach(keyElement => {
     const keyValue = keyElement.getAttribute('data-key');
 
-    // Touchstart: Primary handler for touch devices
-    keyElement.addEventListener('touchstart', (e) => {
-      e.preventDefault(); // Crucial to prevent issues like zoom or ghost clicks
-      // console.log('touchstart:', keyValue); // For debugging
+    keyElement.addEventListener('click', () => {
       handleKeyPress(keyValue);
 
-      // Visual feedback
-      keyElement.style.transform = 'translateY(3px)';
-      keyElement.style.boxShadow = '0 2px 0 #555';
-      if (keyElement.classList.contains('function-key')) {
-        keyElement.style.boxShadow = '0 2px 0 #a24000';
-      }
-    }, { passive: false }); // passive: false is important for preventDefault to work
+      // Visual feedback matching user's "worked" version style
+      keyElement.style.transform = 'translateY(5px)';
+      keyElement.style.boxShadow = '0 0 0 #666';
+      // Note: The user's "worked" version did not have specific shadow for function-key on click
+      // If function keys had a different base shadow defined in CSS, it would revert to that.
+      // For simplicity, the above matches their provided JS visual feedback.
+      // If .function-key needs a different active shadow, it would be:
+      // if (keyElement.classList.contains('function-key')) {
+      //   keyElement.style.boxShadow = '0 0 0 #some_darker_orange_shadow_base'; // Example
+      // } else {
+      //   keyElement.style.boxShadow = '0 0 0 #666';
+      // }
 
-    // Touchend: Mark when touch interaction finishes and reset visuals
-    keyElement.addEventListener('touchend', (e) => {
-      lastTouchEndTime = Date.now();
-      // console.log('touchend:', keyValue, 'lastTouchEndTime:', lastTouchEndTime); // For debugging
       setTimeout(() => {
         keyElement.style.transform = '';
-        keyElement.style.boxShadow = '';
-      }, veryShortDelayForVisuals);
-    });
-
-    // Click: Fallback for mouse, or devices where touch events might not be primary
-    keyElement.addEventListener('click', (e) => {
-      const timeSinceLastTouchEnd = Date.now() - lastTouchEndTime;
-      // console.log('click:', keyValue, 'timeSinceLastTouchEnd:', timeSinceLastTouchEnd); // For debugging
-
-      // If a touch interaction just ended (i.e., touchend fired recently),
-      // this click is likely a "synthetic" event from the tap.
-      if (timeSinceLastTouchEnd < clickGuardThreshold) { // MODIFIED: Used clickGuardThreshold
-        // console.log('click ignored due to recent touch'); // For debugging
-        return; // Assume touchstart already handled the logic.
-      }
-      // Otherwise, it's a genuine click (e.g., from a mouse)
-      // console.log('click processed:', keyValue); // For debugging
-      handleKeyPress(keyValue);
-
-      // Visual feedback for click
-      keyElement.style.transform = 'translateY(3px)';
-      keyElement.style.boxShadow = '0 2px 0 #555';
-      if (keyElement.classList.contains('function-key')) {
-        keyElement.style.boxShadow = '0 2px 0 #a24000';
-      }
-      setTimeout(() => {
-        keyElement.style.transform = '';
-        keyElement.style.boxShadow = '';
-      }, veryShortDelayForVisuals);
+        keyElement.style.boxShadow = ''; // Reverts to CSS defined shadow
+      }, 100); // 100ms visual feedback duration from user's "worked" code
     });
   });
 
-  // Restart button
   restartBtn.addEventListener('click', initGame);
-
-  // Initialize game
   initGame();
 
-  // Prevent zooming on double tap for touch devices
   document.addEventListener('dblclick', (e) => {
     e.preventDefault();
   }, { passive: false });
