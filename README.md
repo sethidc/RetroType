@@ -35,6 +35,28 @@ A T9-style typing game that brings back the nostalgia of old mobile phone keypad
 7.  **Game End**: After typing all 3 words, your results (Time, WPM, Accuracy) will be displayed.
 8.  **Restart**: Click the "RESTART" button to play again with new words.
 
+## 🎯 Accuracy Calculation (How It Works)
+
+Accuracy in the game is calculated using the following formula:
+accuracy = (number of correctly typed letters / total letters attempted) × 100
+
+### 🔍 What this means:
+- **Correctly typed letters**: The number of characters typed by the user that match the corresponding letters in the target word.
+- **Total letters attempted**: The total number of characters the user typed (including incorrect ones).
+- The result is rounded to the nearest whole number and displayed as a percentage.
+
+### ✅ Example:
+If the target word is:
+banana
+
+And the user types:
+banena
+
+Then 5 out of the 6 letters match the target word.
+accuracy = (5 / 6) × 100 = 83.33% → 83%
+
+This encourages both speed and precision in typing practice.
+
 ## 🖥️ Responsive Design
 
 The game is designed with a mobile-first approach, mimicking the portrait orientation of a classic phone. It will scale to fit various screen sizes but is best experienced in a view that maintains the aspect ratio of a phone screen. Zooming is disabled for a more app-like feel.
@@ -45,5 +67,3 @@ The game is designed with a mobile-first approach, mimicking the portrait orient
 * **CSS3**: Styling for the retro look and feel, including Flexbox and Grid for layout.
 * **JavaScript (ES6+)**: Game logic, T9 input handling, and DOM manipulation.
     * **Web Audio API**: For simple sound effects.
-
-## 📁 File Structure
